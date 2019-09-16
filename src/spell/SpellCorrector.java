@@ -8,7 +8,7 @@ package spell;
 
 public class SpellCorrector implements ISpellCorrector {
 
-    Set<String> dictionaryWords = new HashSet<String>();
+    //Set<String> dictionaryWords = new HashSet<String>();
     Trie dictionaryTree = new Trie();
 
     @Override
@@ -20,7 +20,8 @@ public class SpellCorrector implements ISpellCorrector {
             //dictionaryWords.add(scanner.next());
             dictionaryTree.add(scanner.next());
         }
-
+        System.out.println("Just for fun, word count: " + dictionaryTree.getWordCount());
+        System.out.println("Node count: " + dictionaryTree.getNodeCount());
         //System.out.println(dictionaryWords);
     }
 

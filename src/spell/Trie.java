@@ -12,17 +12,27 @@ public class Trie implements ITrie {
 
     @Override
     public INode find(String myWord) {
-        return null;
+        char[] myLetters = myWord.toCharArray();
+        Node myNode;
+        //If the word is in the dictionary
+        myNode = findWord(rootNode, myLetters, 0);
+        if(myNode != null){
+            return myNode;
+        }
+
+        //If the word isn't in the dictionary try to find a similar word
+
+        return null; //If the word is not in the dictionary, nor does a similar word exist
     }
 
     @Override
     public int getWordCount() {
-        return 0;
+        return countWords(rootNode);
     }
 
     @Override
     public int getNodeCount() {
-        return 0;
+        return countNodes(rootNode);
     }
 
     public void populateTrie(Node myNode, char[] myWord, int letterIndex) {
@@ -42,9 +52,55 @@ public class Trie implements ITrie {
             myNode.children[letterInt].increaseCount(); //Increase the count
             System.out.printf("\n%d time(s)\n - \n", myNode.children[letterInt].getValue());
         }
+
     }
 
-    public int charToInt(char myLetter) {
+    private Node findWord(Node myNode, char[] myWord, int letterIndex){ //TODO: Fix this so that there is no letterIndex, just pass a substring of a string (and cut off the first letter
+        int letterInt = charToInt(myWord[letterIndex]);
+        Node finalNode;
+        if(myNode.children[letterInt] == null){
+            return null;
+        }
+        letterIndex++;
+
+        if(letterIndex < myWord.length) { //If we're not to the end of the word yet
+            finalNode = findWord(myNode.children[letterInt], myWord, letterIndex);
+        }
+        else{ //We've successfully found the end of the word
+            return myNode.children[letterInt];
+        }
+
+        return finalNode;
+    }
+
+    private int charToInt(char myLetter) {
         return myLetter - 'a';
+    }
+
+    private int countWords(Node myNode){
+        int wordCount = 0;
+
+        for (int i = 0; i < 26; i++) {
+            if(myNode.children[i] != null){
+                wordCount += countWords(myNode.children[i]);
+                if (myNode.children[i].getValue() > 0){
+                    wordCount++;
+                }
+            }
+        }
+
+        return wordCount;
+    }
+
+    private int countNodes(Node myNode){
+        int nodeCount = 0;
+
+        for (int i = 0; i < 26; i++) {
+            if(myNode.children[i] != null){
+                nodeCount += countNodes(myNode.children[i]);
+                nodeCount++;
+                }
+            }
+        return nodeCount;
     }
 }

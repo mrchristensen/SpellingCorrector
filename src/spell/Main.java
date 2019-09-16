@@ -2,10 +2,6 @@ package spell;
 
 import java.io.IOException;
 
-/**
- * A simple main class for running the spelling corrector. This class is not
- * used by the passoff program.
- */
 public class Main {
 	
 	/**
@@ -16,9 +12,6 @@ public class Main {
 		String dictionaryFileName = args[0];
 		String inputWord = args[1];
 		
-		/**
-		 * Create an instance of your corrector here
-		 */
 		ISpellCorrector corrector = new SpellCorrector();
 		
 		corrector.useDictionary(dictionaryFileName);
