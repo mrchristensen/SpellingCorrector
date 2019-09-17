@@ -8,7 +8,6 @@ package spell;
 
 public class SpellCorrector implements ISpellCorrector {
 
-    //Set<String> dictionaryWords = new HashSet<String>();
     Trie dictionaryTree = new Trie();
 
     @Override

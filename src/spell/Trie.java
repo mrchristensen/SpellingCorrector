@@ -21,7 +21,6 @@ public class Trie implements ITrie {
         char[] myLetters = myWord.toCharArray();
         Node myNode = findWord(rootNode, myLetters, 0);
         return myNode; //Wil be null if it's not found
-
     }
 
     @Override
@@ -90,14 +89,33 @@ public class Trie implements ITrie {
         }
         if(obj.getClass() == spell.Trie.class){
             Trie myTrie = (Trie) obj;
-
-            for (int i = 0; i < 26; i++) {
-                //if();;
-            }
+            return compareTries(rootNode, myTrie.rootNode);
         }
         else{
             return false;
         }
+    }
+
+    private boolean compareTries(Node node1, Node node2){
+
+        for (int i = 0; i < 26; i++) {
+            if(node1.children[i] != null || node2.children[i] != null){
+                if(node1.children[i] == null || node2.children[i] == null){
+                    return false;
+                }
+                else if(node1.children[i].getValue() != node2.children[i].getValue()){
+                    return false;
+                }
+                else{ //continue checking
+                    if(compareTries(node1.children[i], node2.children[i]) == false){
+                        return false;
+                    }
+                }
+            }
+        }
+
+        //If you make it through the whole tree without finding and error return true
+        return true;
     }
 
     @Override
