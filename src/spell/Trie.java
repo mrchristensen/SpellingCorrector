@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Arrays;
 
 public class Trie implements ITrie {
     Node rootNode = new Node();
@@ -18,88 +19,9 @@ public class Trie implements ITrie {
     @Override
     public INode find(String myWord) {
         char[] myLetters = myWord.toCharArray();
-        Node myNode;
-        //If the word is in the dictionary
-        myNode = findWord(rootNode, myLetters, 0);
-        if(myNode != null){
-            return myNode;
-        }
+        Node myNode = findWord(rootNode, myLetters, 0);
+        return myNode; //Wil be null if it's not found
 
-        //If the word isn't in the dictionary try to find a similar word
-        Set<String> candidateWords = new WordTransforms().generateSuggestions(myWord);
-
-        System.out.println("Candidate words: " + candidateWords);
-
-        //Check to see if the candidate words are valid (in the dictionary)
-        //Find potential words (see how many of the generated words are found in the dictionary)
-        Set<String> potentialWords = new HashSet<String>();
-        potentialWords.addAll(findPotentialWords(candidateWords));
-
-        System.out.println("Potential words: " + potentialWords);
-
-        //If none of the generated words is in the dictionary then run the transforms on the potential words to get a distance of two
-        if(potentialWords.size() == 0){
-            System.out.println("Need to look for candidate words with a distance of two.");
-            Set<String> oldCandidateWords = new HashSet<String>();
-            oldCandidateWords.addAll(candidateWords);
-            candidateWords.clear();
-
-            for (String word : oldCandidateWords) {
-                candidateWords.addAll(new WordTransforms().generateSuggestions(word));
-            }
-            System.out.println("New candidate words (dis=2): " + candidateWords);
-
-            potentialWords.addAll(findPotentialWords(candidateWords));
-            System.out.println("New potential words: " + potentialWords);
-
-            if (potentialWords.size() == 0){
-                return null; //There are no words with dist of 2 that are valid suggestions
-            }
-        }
-        if(potentialWords.size() == 1){
-            return findWord(rootNode, potentialWords.iterator().next().toCharArray(), 0);  //TODO:potentialWords.iterator().next().toCharArray() is SOOOOOOO bad
-        }
-        else{ //If there are more than one potential word
-            int frequencyRecord = 0;
-            Set<String> mostFrequentWords = new HashSet<String>();
-
-            for (String word : potentialWords) {
-                int frequency = findWord(rootNode, word.toCharArray(), 0).getValue();
-                if(frequency > frequencyRecord){
-                    frequencyRecord = frequency;
-                    mostFrequentWords.clear();
-                    mostFrequentWords.add(word);
-                }
-                else if(frequency == frequencyRecord){
-                    mostFrequentWords.add(word);
-                }
-            }
-
-            System.out.println("Most frequent words: " + mostFrequentWords);
-
-            if(mostFrequentWords.size() == 0){
-                return null; //There is no suggestion
-            }
-            else if(mostFrequentWords.size() == 1){
-                return findWord(rootNode, mostFrequentWords.iterator().next().toCharArray(), 0);
-            }
-            else{ //There are most than two words with equal frequency
-                return findWord(rootNode, mostFrequentWords.iterator().next().toCharArray(), 0); //TODO: Get this to be alphabetical
-            }
-        }
-    }
-
-    private Set<String> findPotentialWords(Set<String> candidateWordSet) {
-        Set<String> potentialWordSet = new HashSet<String>();
-
-        for (String word : candidateWordSet) {
-            Node tempNode = findWord(rootNode, word.toCharArray(), 0);
-            if(tempNode != null && tempNode.getValue() > 0){ //TODO: Clean up the args of findWord()
-                potentialWordSet.add(word);
-            }
-        }
-
-        return potentialWordSet;
     }
 
     @Override
@@ -116,7 +38,7 @@ public class Trie implements ITrie {
         int letterInt = charToInt(myWord[letterIndex]); //Convert the char to an int
         if (myNode.children[letterInt] == null) { //If the node doesn't exist, generate it
             //System.out.print("(" + myWord[letterIndex] + ")");
-            myNode.children[letterInt] = new Node(myWord[letterIndex]); //Give it the current char
+            myNode.children[letterInt] = new Node(myWord[letterIndex], Arrays.copyOfRange(myWord, 0, letterIndex)); //Give it the current char
         }
         else{
             //System.out.print(myWord[letterIndex]);
@@ -138,16 +60,49 @@ public class Trie implements ITrie {
         if(myNode.children[letterInt] == null){
             return null;
         }
+
         letterIndex++;
 
         if(letterIndex < myWord.length) { //If we're not to the end of the word yet
             finalNode = findWord(myNode.children[letterInt], myWord, letterIndex);
         }
         else{ //We've successfully found the end of the word
-            return myNode.children[letterInt];
+            if(myNode.children[letterInt].getValue() > 0) {
+                return myNode.children[letterInt];
+            }
+            else{
+                return null;
+            }
         }
 
         return finalNode;
+    }
+
+    @Override
+    public String toString() { //Todo: must be recursive
+        return traverseTree(rootNode);
+    }
+
+    @Override
+    public boolean equals(Object obj) { //Todo: must be recursive
+        if(obj == null){
+            return false;
+        }
+        if(obj.getClass() == spell.Trie.class){
+            Trie myTrie = (Trie) obj;
+
+            for (int i = 0; i < 26; i++) {
+                //if();;
+            }
+        }
+        else{
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() { //Todo
+        return super.hashCode();//Hashcode int that you update everytime that you add word (call hashcode on the word) then multiply it by int
     }
 
     private int charToInt(char myLetter) {
@@ -179,6 +134,21 @@ public class Trie implements ITrie {
                 }
             }
         return nodeCount;
+    }
+
+    private String traverseTree(Node myNode){
+        String output = "";
+
+        for (int i = 0; i < 26; i++) {
+            if(myNode.children[i] != null){
+                output += traverseTree(myNode.children[i]);
+                if (myNode.children[i].getValue() > 0){
+                    output = output + myNode.children[i].toString() + "\n";
+                }
+            }
+        }
+
+        return output;
     }
 
 
