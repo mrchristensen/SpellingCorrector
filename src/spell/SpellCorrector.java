@@ -27,8 +27,10 @@ public class SpellCorrector implements ISpellCorrector {
 
     @Override
     public String suggestSimilarWord(String inputWord) {
-        if(dictionaryTree.find(inputWord) != null){
-            return inputWord;
+        INode myNode = dictionaryTree.find(inputWord);
+
+        if(myNode != null){
+            return myNode.toString();
         }
 
         return null;

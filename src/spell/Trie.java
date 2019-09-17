@@ -1,5 +1,9 @@
 package spell;
 
+import javax.swing.*;
+import java.util.HashSet;
+import java.util.Set;
+
 public class Trie implements ITrie {
     Node rootNode = new Node();
 
@@ -21,6 +25,30 @@ public class Trie implements ITrie {
         }
 
         //If the word isn't in the dictionary try to find a similar word
+        Set<String> candidateWords = new WordTransforms().generateSuggestions(myWord);
+
+        //Call WORD TRANSFORMS TODO
+        System.out.println("Candidate words: " + candidateWords);
+
+        //Check to see if the candidate words are valid (in the dictionary)
+        Set<String> potentialWords = new HashSet<String>();
+
+        for (String word : candidateWords) {
+            if(findWord(rootNode, word.toCharArray(), 0) != null){ //TODO: Clean up the args of findWord()
+                potentialWords.add(word);
+            }
+        }
+        System.out.println("Potential words: " + potentialWords);
+
+        if(potentialWords.size() == 0){
+            //TODO:Find distance of two
+        }
+        else if(potentialWords.size() == 1){
+            return findWord(rootNode, potentialWords.iterator().next().toCharArray(), 0);  //TODO:potentialWords.iterator().next().toCharArray() is SOOOOOOO bad
+        }
+        else{ //If there are more than one potential word
+            //TODO: most frequent
+        }
 
         return null; //If the word is not in the dictionary, nor does a similar word exist
     }
@@ -103,4 +131,6 @@ public class Trie implements ITrie {
             }
         return nodeCount;
     }
+
+
 }
