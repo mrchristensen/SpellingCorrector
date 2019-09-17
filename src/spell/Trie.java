@@ -1,6 +1,7 @@
 package spell;
 
 import javax.swing.*;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,30 +28,78 @@ public class Trie implements ITrie {
         //If the word isn't in the dictionary try to find a similar word
         Set<String> candidateWords = new WordTransforms().generateSuggestions(myWord);
 
-        //Call WORD TRANSFORMS TODO
         System.out.println("Candidate words: " + candidateWords);
 
         //Check to see if the candidate words are valid (in the dictionary)
+        //Find potential words (see how many of the generated words are found in the dictionary)
         Set<String> potentialWords = new HashSet<String>();
+        potentialWords.addAll(findPotentialWords(candidateWords));
 
-        for (String word : candidateWords) {
-            if(findWord(rootNode, word.toCharArray(), 0) != null){ //TODO: Clean up the args of findWord()
-                potentialWords.add(word);
-            }
-        }
         System.out.println("Potential words: " + potentialWords);
 
+        //If none of the generated words is in the dictionary then run the transforms on the potential words to get a distance of two
         if(potentialWords.size() == 0){
-            //TODO:Find distance of two
+            System.out.println("Need to look for candidate words with a distance of two.");
+            Set<String> oldCandidateWords = new HashSet<String>();
+            oldCandidateWords.addAll(candidateWords);
+            candidateWords.clear();
+
+            for (String word : oldCandidateWords) {
+                candidateWords.addAll(new WordTransforms().generateSuggestions(word));
+            }
+            System.out.println("New candidate words (dis=2): " + candidateWords);
+
+            potentialWords.addAll(findPotentialWords(candidateWords));
+            System.out.println("New potential words: " + potentialWords);
+
+            if (potentialWords.size() == 0){
+                return null; //There are no words with dist of 2 that are valid suggestions
+            }
         }
-        else if(potentialWords.size() == 1){
+        if(potentialWords.size() == 1){
             return findWord(rootNode, potentialWords.iterator().next().toCharArray(), 0);  //TODO:potentialWords.iterator().next().toCharArray() is SOOOOOOO bad
         }
         else{ //If there are more than one potential word
-            //TODO: most frequent
+            int frequencyRecord = 0;
+            Set<String> mostFrequentWords = new HashSet<String>();
+
+            for (String word : potentialWords) {
+                int frequency = findWord(rootNode, word.toCharArray(), 0).getValue();
+                if(frequency > frequencyRecord){
+                    frequencyRecord = frequency;
+                    mostFrequentWords.clear();
+                    mostFrequentWords.add(word);
+                }
+                else if(frequency == frequencyRecord){
+                    mostFrequentWords.add(word);
+                }
+            }
+
+            System.out.println("Most frequent words: " + mostFrequentWords);
+
+            if(mostFrequentWords.size() == 0){
+                return null; //There is no suggestion
+            }
+            else if(mostFrequentWords.size() == 1){
+                return findWord(rootNode, mostFrequentWords.iterator().next().toCharArray(), 0);
+            }
+            else{ //There are most than two words with equal frequency
+                return findWord(rootNode, mostFrequentWords.iterator().next().toCharArray(), 0); //TODO: Get this to be alphabetical
+            }
+        }
+    }
+
+    private Set<String> findPotentialWords(Set<String> candidateWordSet) {
+        Set<String> potentialWordSet = new HashSet<String>();
+
+        for (String word : candidateWordSet) {
+            Node tempNode = findWord(rootNode, word.toCharArray(), 0);
+            if(tempNode != null && tempNode.getValue() > 0){ //TODO: Clean up the args of findWord()
+                potentialWordSet.add(word);
+            }
         }
 
-        return null; //If the word is not in the dictionary, nor does a similar word exist
+        return potentialWordSet;
     }
 
     @Override
@@ -60,17 +109,17 @@ public class Trie implements ITrie {
 
     @Override
     public int getNodeCount() {
-        return countNodes(rootNode);
+        return countNodes(rootNode) + 1; //Plus one to count the root node
     }
 
     public void populateTrie(Node myNode, char[] myWord, int letterIndex) {
         int letterInt = charToInt(myWord[letterIndex]); //Convert the char to an int
         if (myNode.children[letterInt] == null) { //If the node doesn't exist, generate it
-            System.out.print("(" + myWord[letterIndex] + ")");
+            //System.out.print("(" + myWord[letterIndex] + ")");
             myNode.children[letterInt] = new Node(myWord[letterIndex]); //Give it the current char
         }
         else{
-            System.out.print(myWord[letterIndex]);
+            //System.out.print(myWord[letterIndex]);
         }
         letterIndex++;
 
@@ -78,7 +127,7 @@ public class Trie implements ITrie {
             populateTrie(myNode.children[letterInt], myWord, letterIndex); //Recursive call
         } else { //We've reached the end of the word
             myNode.children[letterInt].increaseCount(); //Increase the count
-            System.out.printf("\n%d time(s)\n - \n", myNode.children[letterInt].getValue());
+            //System.out.printf("\n%d time(s)\n - \n", myNode.children[letterInt].getValue());
         }
 
     }

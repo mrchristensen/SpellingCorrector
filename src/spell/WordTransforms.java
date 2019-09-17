@@ -32,7 +32,7 @@ public class WordTransforms {
             char temp = newWord[i];
             newWord[i] = newWord[i+1];
             newWord[i+1] = temp;
-            System.out.println(newWord);
+            //System.out.println(newWord);
             newCandidates.add(String.valueOf(newWord));
         }
 
