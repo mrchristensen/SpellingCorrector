@@ -18,8 +18,10 @@ public class WordTransforms {
         Set<String> newCandidates = new HashSet<String>();
         for (int i = 0; i < myWord.length(); i++) {
             String newWord = myWord.substring(0, i) + myWord.substring(i + 1, myWord.length());
-            //%%%System.out.println(newWord);
-            newCandidates.add(newWord);
+
+            if(newWord.length() > 0){
+                newCandidates.add(newWord);
+            }
         }
 
         return newCandidates;
@@ -55,6 +57,7 @@ public class WordTransforms {
         Set<String> newCandidates = new HashSet<String>();
 
         for (int i = 0; i < myWord.length() + 1; i++) {
+
             for (int j = 0; j < 26; j++) {
                 String newWord = myWord.substring(0,i) + (char) (j + 'a') + myWord.substring(i, myWord.length());
                 newCandidates.add(newWord);

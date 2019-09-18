@@ -8,12 +8,14 @@ import java.util.Arrays;
 
 public class Trie implements ITrie {
     Node rootNode = new Node();
+    private int hashint = 0;
 
     @Override
     public void add(String myWord) {
         char[] myLetters = myWord.toCharArray();
         int index = 0;
         populateTrie(rootNode, myLetters, index);
+        hashint += myWord.hashCode();
     }
 
     @Override
@@ -78,12 +80,12 @@ public class Trie implements ITrie {
     }
 
     @Override
-    public String toString() { //Todo: must be recursive
+    public String toString() {
         return traverseTree(rootNode);
     }
 
     @Override
-    public boolean equals(Object obj) { //Todo: must be recursive
+    public boolean equals(Object obj) {
         if(obj == null){
             return false;
         }
@@ -119,8 +121,8 @@ public class Trie implements ITrie {
     }
 
     @Override
-    public int hashCode() { //Todo
-        return super.hashCode();//Hashcode int that you update everytime that you add word (call hashcode on the word) then multiply it by int
+    public int hashCode() {
+        return hashint * 31;//Hashcode int that you update everytime that you add word (call hashcode on the word) then multiply it by int
     }
 
     private int charToInt(char myLetter) {
@@ -159,10 +161,10 @@ public class Trie implements ITrie {
 
         for (int i = 0; i < 26; i++) {
             if(myNode.children[i] != null){
-                output += traverseTree(myNode.children[i]);
                 if (myNode.children[i].getValue() > 0){
                     output = output + myNode.children[i].toString() + "\n";
                 }
+                output += traverseTree(myNode.children[i]);
             }
         }
 

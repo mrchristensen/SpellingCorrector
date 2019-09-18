@@ -2,9 +2,7 @@ package spell;
 
         import java.io.File;
         import java.io.IOException;
-        import java.util.HashSet;
-        import java.util.Scanner;
-        import java.util.Set;
+        import java.util.*;
 
 public class SpellCorrector implements ISpellCorrector {
 
@@ -16,19 +14,24 @@ public class SpellCorrector implements ISpellCorrector {
         Scanner scanner = new Scanner(myFile);
 
         while(scanner.hasNext()){
-            //dictionaryWords.add(scanner.next());
-            dictionaryTree.add(scanner.next());
+            dictionaryTree.add(scanner.next().toLowerCase());
         }
+
         System.out.println("-Just for fun-\nWord count: " + dictionaryTree.getWordCount());
         System.out.println("Node count: " + dictionaryTree.getNodeCount());
         //System.out.println("\nToString(): \n" + dictionaryTree.toString());
         System.out.println("-");
-        //System.out.println(dictionaryWords);
     }
 
     @Override
     public String suggestSimilarWord(String inputWord) {
         INode myNode;
+
+        if(inputWord.length() == 0 || inputWord == null){
+            return null;
+        }
+
+        inputWord = inputWord.toLowerCase(); //Sanitize input
 
         //If the input word is in the dictionary return it
         myNode = dictionaryTree.find(inputWord);
@@ -87,7 +90,9 @@ public class SpellCorrector implements ISpellCorrector {
                 return mostFrequentWords.iterator().next();
             }
             else{ //There are more than two words with equal frequency, pick the most alphabetical one
-                return mostFrequentWords.iterator().next(); //TODO: Get this to be alphabetical
+                List<String> myList = new ArrayList<String>(mostFrequentWords);
+                java.util.Collections.sort(myList);
+                return myList.get(0); //This will be the most alphabetical
             }
         }
 
