@@ -17,7 +17,7 @@ public class SpellCorrector implements ISpellCorrector {
             dictionaryTree.add(scanner.next().toLowerCase());
         }
 
-        System.out.println("-Just for fun-\nWord count: " + dictionaryTree.getWordCount());
+        System.out.println("Word count: " + dictionaryTree.getWordCount());
         System.out.println("Node count: " + dictionaryTree.getNodeCount());
         //System.out.println("\nToString(): \n" + dictionaryTree.toString());
         System.out.println("-");
@@ -26,6 +26,8 @@ public class SpellCorrector implements ISpellCorrector {
     @Override
     public String suggestSimilarWord(String inputWord) {
         INode myNode;
+
+        System.out.println("Input word: " + inputWord);
 
         if(inputWord.length() == 0 || inputWord == null){
             return null;
@@ -56,7 +58,7 @@ public class SpellCorrector implements ISpellCorrector {
             for (String word : oldCandidateWords) {
                 candidateWords.addAll(new WordTransforms().generateSuggestions(word));
             }
-            System.out.println("New candidate words (dis=2): " + candidateWords);
+//            System.out.println("New candidate words (dis=2): " + candidateWords);
 
             potentialWords.addAll(findPotentialWords(candidateWords));
             System.out.println("New potential words: " + potentialWords);
