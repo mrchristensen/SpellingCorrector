@@ -122,7 +122,7 @@ public class Trie implements ITrie {
 
     @Override
     public int hashCode() {
-        return hashint * 31;//Hashcode int that you update everytime that you add word (call hashcode on the word) then multiply it by int
+        return hashint * 31;//Hashcode int that you update every time that you add word (call hashcode on the word) then multiply it by int
     }
 
     private int charToInt(char myLetter) {
